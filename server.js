@@ -3,10 +3,21 @@ const app = express();
 const path = require('path');
 const cors = require('cors')
 const port = 3001;
+const mongoose = require('mongoose');
 
+const {Animal} = require('./models');
 
-app.use(cors())
+mongoose.connect('mongodb://localhost/zoo', {useNewUrlParser: true});
 
+const db = mongoose.connection;
+db.on('error', console.error.bind(console, 'connection error:'))
+db.once('open', onDBConnected)
+
+function onDBConnected(){
+  console.log('we are connected to mongo db')
+}
+
+app.use(cors());
 
 const animals = [
     {
@@ -32,6 +43,12 @@ const animals = [
 app.get('/', function(req, res){
   res.status(200).json(animals);
 })
+app.post('/', function(req, res){
+  Animal.create(req.query, function(err, savedAnimal){
+    if (err) return res.status(400).json(err);
+    res.status(201).json(savedAnimal);
+  })
+});
 
 app.listen(port, function(){
   console.log('we are running on ' + port);
