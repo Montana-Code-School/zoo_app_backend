@@ -6,6 +6,7 @@ const port = 3001;
 const mongoose = require('mongoose');
 
 const {Animal} = require('./models');
+const {getAnimals, createAnimal} = require('./routeHandlers');
 
 mongoose.connect('mongodb://localhost/zoo', {useNewUrlParser: true});
 
@@ -21,34 +22,27 @@ app.use(cors());
 
 const animals = [
     {
-      name: 'tiger', 
+      name: 'tiger',
       predator: true,
       age: 7,
       id: 1,
     },
     {
-      name: 'horse', 
+      name: 'horse',
       predator: false,
       age: 10,
       id: 2,
     },
     {
-      name: 'echidna', 
+      name: 'echidna',
       predator: true,
       age: 2,
       id: 3,
     },
   ]
 
-app.get('/', function(req, res){
-  res.status(200).json(animals);
-})
-app.post('/', function(req, res){
-  Animal.create(req.query, function(err, savedAnimal){
-    if (err) return res.status(400).json(err);
-    res.status(201).json(savedAnimal);
-  })
-});
+app.get('/', getAnimals);
+app.post('/', createAnimal);
 
 app.listen(port, function(){
   console.log('we are running on ' + port);
