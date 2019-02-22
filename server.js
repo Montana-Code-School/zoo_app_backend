@@ -6,7 +6,7 @@ const port = 3001;
 const mongoose = require('mongoose');
 
 const {Animal} = require('./models');
-const {getAnimals, createAnimal} = require('./routeHandlers');
+const {getAnimals, createAnimal, deleteAnimal} = require('./routeHandlers');
 
 mongoose.connect('mongodb://localhost/zoo', {useNewUrlParser: true});
 
@@ -43,6 +43,7 @@ const animals = [
 
 app.get('/', getAnimals);
 app.post('/', createAnimal);
+app.delete('/:_id', deleteAnimal);
 
 app.listen(port, function(){
   console.log('we are running on ' + port);
