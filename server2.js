@@ -1,49 +1,46 @@
 const express = require('express');
 const app = express();
 var mysql = require('mysql');
+const cors = require('cors')
 const port = 3005;
+
 
 var connection = mysql.createConnection({
   host     : 'localhost',
   user     : 'root',
   password : 'password',
-  database : 'plants'
 });
 
+app.use(cors());
 
-function test(req, res) {
-  console.log('test route');
-  let result;
-  connection.connect()
-  connection.query("Select trees.common_name from trees", function (err, rows, columns, fields) {
-  if (err) throw err
-  result = rows;
-  console.log('The solution is: ', rows);
-  })
+connection.connect()
 //connection.end()
-  res.json(result);
-}
+const routeHandlersMySql = require('./routeHandlersMySql');
+const { getAnimals, createAnimal, deleteAnimal } = routeHandlersMySql(connection);
 
-// Task.getAllTask = function getAllTask(result) {
-//   sql.query("Select * from tasks", function (err, res) {
+connection.query("CREATE DATABASE IF NOT EXISTS zoo", function (err, result) {
+  if (err) throw err
+  console.log("created");
+})
+connection.query("USE zoo", function (err, result) {
+  if (err) throw err
+  console.log("using");
+})
+connection.query(
+  `CREATE TABLE IF NOT EXISTS animals
+  (_id INTEGER NOT NULL PRIMARY KEY AUTO_INCREMENT,
+  name VARCHAR(255), predator BOOLEAN, age INTEGER)`,
+  function (err, result) {
+    if (err) throw err
+    console.log("create animals table, ");
+})
 
-//           if(err) {
-//               console.log("error: ", err);
-//               result(null, err);
-//           }
-//           else{
-//             console.log('tasks : ', res);
 
-//            result(null, res);
-//           }
-//       });
-// };
-
-app.get('/', test);
+app.get('/', getAnimals);
+app.post('/', createAnimal);
+app.delete('/:_id', deleteAnimal);
 
 
 app.listen(port, function(){
   console.log('we are running on ' + port);
 })
-
-
